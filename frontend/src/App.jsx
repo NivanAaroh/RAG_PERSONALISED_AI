@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 function App() {
   const [message, setMessage] = useState('')
@@ -6,7 +7,9 @@ function App() {
   const [loading, setLoading] = useState(false)
 
   async function sendMessage() {
-    if (!message.trim()) {
+    const trimmedMessage = message.trim()
+
+    if (!trimmedMessage || loading) {
       return
     }
 
@@ -14,20 +17,53 @@ function App() {
     setResponse('')
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/chat?message=${encodeURIComponent(message)}`,
-        {
-          method: 'POST',
-        }
-
-      )
+      const res = await fetch('http://127.0.0.1:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: trimmedMessage,
+        }),
+      })
 
       if (!res.ok) {
         throw new Error(`HTTP error: ${res.status}`)
       }
 
-      const data = await res.json()
-      setResponse(data.response)
+      if (!res.body) {
+        throw new Error('No response stream received from backend')
+      }
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let receivedText = ''
+
+      while (true) {
+        const { value, done } = await reader.read()
+
+        if (done) {
+          break
+        }
+
+        const chunk = decoder.decode(value, { stream: true })
+
+        if (chunk) {
+          receivedText += chunk
+          setResponse(receivedText)
+        }
+      }
+
+      const finalChunk = decoder.decode()
+
+      if (finalChunk) {
+        receivedText += finalChunk
+        setResponse(receivedText)
+      }
+
+      if (!receivedText.trim()) {
+        throw new Error('Empty response received from backend')
+      }
     } catch (error) {
       setResponse(`Error: ${error.message}`)
     } finally {
@@ -57,15 +93,16 @@ function App() {
               }
             }}
             placeholder="Enter a message"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+            disabled={loading}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 disabled:opacity-50"
           />
 
           <button
             onClick={sendMessage}
-            disabled={loading}
+            disabled={loading || !message.trim()}
             className="mt-4 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Sending...' : 'Send'}
+            {loading ? 'Generating...' : 'Send'}
           </button>
         </div>
 
@@ -75,9 +112,9 @@ function App() {
               Backend response:
             </p>
 
-            <p className="mt-2 text-gray-900">
-              {response}
-            </p>
+            <div className="mt-2 text-left text-gray-900">
+              <ReactMarkdown>{response}</ReactMarkdown>
+            </div>
           </div>
         )}
       </div>
