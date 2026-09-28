@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
-from llm import generate_response
+from backend.llm import generate_response
 
 
 app = FastAPI(title="RAG Personalised AI")
@@ -36,8 +37,12 @@ def health():
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
-        response = generate_response(request.message)
-        return {"response": response}
+        response_stream = generate_response(request.message)
+
+        return StreamingResponse(
+            response_stream,
+            media_type="text/plain; charset=utf-8",
+        )
 
     except RuntimeError as exc:
         raise HTTPException(
@@ -50,4 +55,3 @@ def chat(request: ChatRequest):
             status_code=502,
             detail="LLM service request failed.",
         ) from exc
-    

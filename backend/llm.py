@@ -1,10 +1,12 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from groq import Groq
 
 
-load_dotenv()
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(env_path)
 
 api_key = os.getenv("GROQ_API_KEY")
 model = os.getenv("GROQ_MODEL")
@@ -25,8 +27,8 @@ SYSTEM_PROMPT = (
 )
 
 
-def generate_response(user_message: str) -> str:
-    response = client.chat.completions.create(
+def generate_response(user_message: str):
+    response_stream = client.chat.completions.create(
         model=model,
         messages=[
             {
@@ -38,11 +40,14 @@ def generate_response(user_message: str) -> str:
                 "content": user_message,
             },
         ],
+        stream=True,
     )
 
-    generated_text = response.choices[0].message.content
+    for chunk in response_stream:
+        if not chunk.choices:
+            continue
 
-    if not generated_text:
-        raise RuntimeError("The LLM returned an empty response.")
+        content = chunk.choices[0].delta.content
 
-    return generated_text
+        if content:
+            yield content
