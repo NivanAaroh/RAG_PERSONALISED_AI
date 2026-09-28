@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, field_validator
+
+from llm import generate_response
 
 
 app = FastAPI(title="RAG Personalised AI")
@@ -14,13 +17,37 @@ app.add_middleware(
 )
 
 
+class ChatRequest(BaseModel):
+    message: str
+
+    @field_validator("message")
+    @classmethod
+    def validate_message(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Message cannot be empty or whitespace-only.")
+        return value
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
 @app.post("/chat")
-def chat(message: str):
-    return {
-        "response": f"Echo: {message}"
-    }
+def chat(request: ChatRequest):
+    try:
+        response = generate_response(request.message)
+        return {"response": response}
+
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="LLM service request failed.",
+        ) from exc
+    
