@@ -1,5 +1,6 @@
 from pathlib import Path
 from uuid import uuid4
+from backend.retrieval import retrieve
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +38,26 @@ class ChatRequest(BaseModel):
     def validate_message(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("Message cannot be empty or whitespace-only.")
+        return value
+
+
+class RetrieveRequest(BaseModel):
+    query: str
+    document_id: str
+    top_k: int = 5
+
+    @field_validator("query")
+    @classmethod
+    def validate_query(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Query cannot be empty or whitespace-only.")
+        return value
+
+    @field_validator("document_id")
+    @classmethod
+    def validate_document_id(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Document ID is required.")
         return value
 
 
@@ -135,4 +156,33 @@ def chat(request: ChatRequest):
         raise HTTPException(
             status_code=502,
             detail="LLM service request failed.",
+        ) from exc
+
+
+@app.post("/api/retrieve")
+def retrieve_documents(request: RetrieveRequest):
+    try:
+        results = retrieve(
+            request.query,
+            request.document_id,
+            request.top_k,
+        )
+
+        return {
+            "query": request.query,
+            "document_id": request.document_id,
+            "top_k": request.top_k,
+            "results": results,
+        }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Retrieval failed: {exc}",
         ) from exc

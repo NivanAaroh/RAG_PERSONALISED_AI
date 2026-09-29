@@ -19,3 +19,16 @@ def embed_chunks(chunks):
     )
 
     return embeddings.tolist()
+
+
+def embed_text(text):
+    if not text or not text.strip():
+        raise ValueError("Text cannot be empty or whitespace-only.")
+
+    embedding = _model.encode(
+        [text],
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+    )
+
+    return embedding[0].tolist()
