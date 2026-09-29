@@ -6,6 +6,55 @@ function App() {
   const [response, setResponse] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState('')
+  const [document, setDocument] = useState(null)
+
+  async function uploadDocument() {
+    if (!selectedFile || uploading) {
+      return
+    }
+
+    setUploading(true)
+    setUploadStatus('')
+    setDocument(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+
+      const res = await fetch('http://127.0.0.1:8000/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        let detail = `HTTP error: ${res.status}`
+
+        try {
+          const errorData = await res.json()
+          if (errorData.detail) {
+            detail = errorData.detail
+          }
+        } catch {
+          // Keep the HTTP error message.
+        }
+
+        throw new Error(detail)
+      }
+
+      const data = await res.json()
+
+      setDocument(data)
+      setUploadStatus('Upload successful.')
+    } catch (error) {
+      setUploadStatus(`Upload failed: ${error.message}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   async function sendMessage() {
     const trimmedMessage = message.trim()
 
@@ -79,8 +128,64 @@ function App() {
         </h1>
 
         <p className="mt-2 text-gray-600">
-          Part 0 — Frontend to Backend Test
+          Part 2 — PDF Knowledge Ingestion
         </p>
+
+        <div className="mt-6 rounded-lg border border-gray-200 p-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Upload PDF
+          </h2>
+
+          <input
+            type="file"
+            accept=".pdf,application/pdf"
+            onChange={(event) => {
+              setSelectedFile(event.target.files?.[0] || null)
+              setUploadStatus('')
+              setDocument(null)
+            }}
+            disabled={uploading}
+            className="mt-3 w-full text-sm"
+          />
+
+          <button
+            onClick={uploadDocument}
+            disabled={uploading || !selectedFile}
+            className="mt-4 rounded-lg bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            {uploading ? 'Uploading...' : 'Upload PDF'}
+          </button>
+
+          {uploadStatus && (
+            <p className="mt-3 text-sm text-gray-700">
+              {uploadStatus}
+            </p>
+          )}
+
+          {document && (
+            <div className="mt-4 rounded-lg bg-gray-100 p-4 text-left text-sm text-gray-800">
+              <p>
+                <span className="font-semibold">Document:</span>{' '}
+                {document.document_name}
+              </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Document ID:</span>{' '}
+                {document.document_id}
+              </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Pages:</span>{' '}
+                {document.page_count}
+              </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Pages with text:</span>{' '}
+                {document.pages_with_text}
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="mt-6">
           <input
