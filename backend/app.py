@@ -1,17 +1,19 @@
+import json
 from pathlib import Path
 from uuid import uuid4
-from backend.retrieval import retrieve
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
+from backend.retrieval import retrieve
 from backend.ingestion import ingest_pdf
 from backend.chunking import chunk_document
 from backend.embeddings import embed_chunks
 from backend.vector_store import upsert_chunks
 from backend.llm import generate_response
+from backend.rag import run_rag
 
 
 app = FastAPI(title="RAG Personalised AI")
@@ -51,6 +53,26 @@ class RetrieveRequest(BaseModel):
     def validate_query(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("Query cannot be empty or whitespace-only.")
+        return value
+
+    @field_validator("document_id")
+    @classmethod
+    def validate_document_id(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Document ID is required.")
+        return value
+
+
+class RAGRequest(BaseModel):
+    question: str
+    document_id: str
+    top_k: int = 5
+
+    @field_validator("question")
+    @classmethod
+    def validate_question(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Question cannot be empty or whitespace-only.")
         return value
 
     @field_validator("document_id")
@@ -185,4 +207,72 @@ def retrieve_documents(request: RetrieveRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Retrieval failed: {exc}",
+        ) from exc
+
+
+@app.post("/api/rag")
+def rag(request: RAGRequest):
+    try:
+        evidence, response_stream = run_rag(
+            request.question,
+            request.document_id,
+            request.top_k,
+        )
+
+        def event_stream():
+            if response_stream is None:
+                yield "event: sources\n"
+                yield "data: []\n\n"
+
+                refusal = (
+                    "The requested information cannot be established "
+                    "from the available document evidence."
+                )
+
+                yield "event: answer\n"
+                yield f"data: {json.dumps(refusal)}\n\n"
+
+                yield "event: done\n"
+                yield "data: {}\n\n"
+                return
+
+            sources = [
+                {
+                    "chunk_id": item["chunk_id"],
+                    "document_id": item["document_id"],
+                    "document_name": item["document_name"],
+                    "page": item["page"],
+                }
+                for item in evidence
+            ]
+
+            yield "event: sources\n"
+            yield f"data: {json.dumps(sources)}\n\n"
+
+            for text in response_stream:
+                yield "event: answer\n"
+                yield f"data: {json.dumps(text)}\n\n"
+
+            yield "event: done\n"
+            yield "data: {}\n\n"
+
+        return StreamingResponse(
+            event_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+            },
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="RAG request failed.",
         ) from exc
