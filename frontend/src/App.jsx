@@ -4,20 +4,17 @@ import ReactMarkdown from 'react-markdown'
 const API_BASE = 'http://127.0.0.1:8000'
 
 function App() {
-  const [message, setMessage] = useState('')
-  const [response, setResponse] = useState('')
-  const [loading, setLoading] = useState(false)
-
   const [selectedFile, setSelectedFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('No document selected.')
   const [uploadError, setUploadError] = useState('')
   const [document, setDocument] = useState(null)
 
-  const [retrieveQuery, setRetrieveQuery] = useState('')
-  const [retrieveLoading, setRetrieveLoading] = useState(false)
-  const [retrieveError, setRetrieveError] = useState('')
-  const [retrieval, setRetrieval] = useState(null)
+  const [ragQuery, setRagQuery] = useState('')
+  const [ragLoading, setRagLoading] = useState(false)
+  const [ragError, setRagError] = useState('')
+  const [ragAnswer, setRagAnswer] = useState('')
+  const [ragSources, setRagSources] = useState([])
 
   function handleFileChange(event) {
     const file = event.target.files?.[0] || null
@@ -26,12 +23,11 @@ function App() {
     setDocument(null)
     setUploadError('')
     setUploadStatus('No document selected.')
-    setRetrieval(null)
-    setRetrieveError('')
+    setRagAnswer('')
+    setRagSources([])
+    setRagError('')
 
-    if (!file) {
-      return
-    }
+    if (!file) return
 
     if (
       file.type !== 'application/pdf' &&
@@ -46,15 +42,14 @@ function App() {
   }
 
   async function uploadDocument() {
-    if (!selectedFile || uploading) {
-      return
-    }
+    if (!selectedFile || uploading) return
 
     setUploading(true)
     setUploadError('')
     setDocument(null)
-    setRetrieval(null)
-    setRetrieveError('')
+    setRagAnswer('')
+    setRagSources([])
+    setRagError('')
     setUploadStatus('Uploading...')
 
     try {
@@ -73,12 +68,9 @@ function App() {
 
         try {
           const errorData = await res.json()
-
-          if (errorData.detail) {
-            detail = errorData.detail
-          }
+          if (errorData.detail) detail = errorData.detail
         } catch {
-          // Keep the HTTP error message.
+          // Keep HTTP error.
         }
 
         throw new Error(detail)
@@ -96,25 +88,24 @@ function App() {
     }
   }
 
-  async function retrieveEvidence() {
-    const trimmedQuery = retrieveQuery.trim()
+  async function askRagQuestion() {
+    const question = ragQuery.trim()
 
-    if (!trimmedQuery || retrieveLoading || !document?.document_id) {
-      return
-    }
+    if (!question || ragLoading || !document?.document_id) return
 
-    setRetrieveLoading(true)
-    setRetrieveError('')
-    setRetrieval(null)
+    setRagLoading(true)
+    setRagError('')
+    setRagAnswer('')
+    setRagSources([])
 
     try {
-      const res = await fetch(`${API_BASE}/api/retrieve`, {
+      const res = await fetch(`${API_BASE}/api/rag`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: trimmedQuery,
+          question,
           document_id: document.document_id,
           top_k: 5,
         }),
@@ -125,49 +116,12 @@ function App() {
 
         try {
           const errorData = await res.json()
-
-          if (errorData.detail) {
-            detail = errorData.detail
-          }
+          if (errorData.detail) detail = errorData.detail
         } catch {
-          // Keep the HTTP error message.
+          // Keep HTTP error.
         }
 
         throw new Error(detail)
-      }
-
-      const data = await res.json()
-      setRetrieval(data)
-    } catch (error) {
-      setRetrieveError(`Retrieval failed: ${error.message}`)
-    } finally {
-      setRetrieveLoading(false)
-    }
-  }
-
-  async function sendMessage() {
-    const trimmedMessage = message.trim()
-
-    if (!trimmedMessage || loading) {
-      return
-    }
-
-    setLoading(true)
-    setResponse('')
-
-    try {
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: trimmedMessage,
-        }),
-      })
-
-      if (!res.ok) {
-        throw new Error(`HTTP error: ${res.status}`)
       }
 
       if (!res.body) {
@@ -176,37 +130,62 @@ function App() {
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
-      let receivedText = ''
+      let buffer = ''
 
       while (true) {
         const { value, done } = await reader.read()
 
-        if (done) {
-          break
-        }
+        if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
+        buffer += decoder.decode(value, { stream: true })
 
-        if (chunk) {
-          receivedText += chunk
-          setResponse(receivedText)
+        const events = buffer.split('\n\n')
+        buffer = events.pop() || ''
+
+        for (const eventBlock of events) {
+          processSseEvent(eventBlock)
         }
       }
 
-      const finalChunk = decoder.decode()
+      buffer += decoder.decode()
 
-      if (finalChunk) {
-        receivedText += finalChunk
-        setResponse(receivedText)
-      }
-
-      if (!receivedText.trim()) {
-        throw new Error('Empty response received from backend')
+      if (buffer.trim()) {
+        processSseEvent(buffer)
       }
     } catch (error) {
-      setResponse(`Error: ${error.message}`)
+      setRagError(`RAG request failed: ${error.message}`)
     } finally {
-      setLoading(false)
+      setRagLoading(false)
+    }
+  }
+
+  function processSseEvent(eventBlock) {
+    const lines = eventBlock.split('\n')
+    let eventName = ''
+    let dataText = ''
+
+    for (const line of lines) {
+      if (line.startsWith('event:')) {
+        eventName = line.slice(6).trim()
+      } else if (line.startsWith('data:')) {
+        dataText += line.slice(5).trim()
+      }
+    }
+
+    if (!eventName || !dataText) return
+
+    try {
+      const data = JSON.parse(dataText)
+
+      if (eventName === 'sources') {
+        setRagSources(data)
+      } else if (eventName === 'answer') {
+        setRagAnswer((previous) => previous + data)
+      } else if (eventName === 'done') {
+        // Stream completed.
+      }
+    } catch {
+      setRagError('Invalid SSE data received from backend.')
     }
   }
 
@@ -218,7 +197,7 @@ function App() {
         </h1>
 
         <p className="mt-2 text-gray-600">
-          Part 6 — Browser Vertical Slice
+          Part 6 — Browser Vertical Slice (WP6-B RAG Flow)
         </p>
 
         <div className="mt-6 rounded-lg border border-gray-200 p-4">
@@ -248,195 +227,102 @@ function App() {
           </p>
 
           {uploadError && (
-            <p className="mt-2 text-sm text-red-600">
-              {uploadError}
-            </p>
+            <p className="mt-2 text-sm text-red-600">{uploadError}</p>
           )}
 
           {document && (
             <div className="mt-4 rounded-lg bg-gray-100 p-4 text-left text-sm text-gray-800">
-              <p>
-                <span className="font-semibold">Status:</span> Ready
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Document:</span>{' '}
-                {document.document_name}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Document ID:</span>{' '}
-                {document.document_id}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Pages:</span>{' '}
-                {document.page_count}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Pages with text:</span>{' '}
-                {document.pages_with_text}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Chunks:</span>{' '}
-                {document.chunk_count}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Embeddings:</span>{' '}
-                {document.embedding_count}
-              </p>
-
-              <p className="mt-1">
-                <span className="font-semibold">Stored:</span>{' '}
-                {document.stored_count}
-              </p>
+              <p><span className="font-semibold">Status:</span> Ready</p>
+              <p className="mt-1"><span className="font-semibold">Document:</span> {document.document_name}</p>
+              <p className="mt-1"><span className="font-semibold">Document ID:</span> {document.document_id}</p>
+              <p className="mt-1"><span className="font-semibold">Pages:</span> {document.page_count}</p>
+              <p className="mt-1"><span className="font-semibold">Pages with text:</span> {document.pages_with_text}</p>
+              <p className="mt-1"><span className="font-semibold">Chunks:</span> {document.chunk_count}</p>
+              <p className="mt-1"><span className="font-semibold">Embeddings:</span> {document.embedding_count}</p>
+              <p className="mt-1"><span className="font-semibold">Stored:</span> {document.stored_count}</p>
             </div>
           )}
         </div>
 
         <div className="mt-6 rounded-lg border border-blue-200 p-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            Retrieve Evidence
+            Ask Document (RAG)
           </h2>
-
-          <p className="mt-1 text-sm text-gray-600">
-            Existing diagnostic retrieval interface. RAG question flow will be
-            added in WP6-B.
-          </p>
 
           <input
             type="text"
-            value={retrieveQuery}
-            onChange={(event) => setRetrieveQuery(event.target.value)}
+            value={ragQuery}
+            onChange={(event) => setRagQuery(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                retrieveEvidence()
-              }
+              if (event.key === 'Enter') askRagQuestion()
             }}
             placeholder="Enter a question about the uploaded document"
-            disabled={retrieveLoading || !document}
+            disabled={ragLoading || !document}
             className="mt-3 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 disabled:opacity-50"
           />
 
           <button
-            onClick={retrieveEvidence}
-            disabled={
-              retrieveLoading ||
-              !document ||
-              !retrieveQuery.trim()
-            }
+            onClick={askRagQuestion}
+            disabled={ragLoading || !document || !ragQuery.trim()}
             className="mt-4 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {retrieveLoading ? 'Retrieving...' : 'Retrieve'}
+            {ragLoading ? 'Generating...' : 'Ask RAG'}
           </button>
 
           {!document && (
             <p className="mt-3 text-sm text-gray-500">
-              Upload a PDF before running retrieval.
+              Upload a PDF before asking questions.
             </p>
           )}
 
-          {retrieveError && (
-            <p className="mt-3 text-sm text-red-600">
-              {retrieveError}
-            </p>
+          {ragError && (
+            <p className="mt-3 text-sm text-red-600">{ragError}</p>
           )}
 
-          {retrieval && (
-            <div className="mt-6 text-left">
-              <div className="rounded-lg bg-gray-100 p-4 text-sm text-gray-800">
-                <p>
-                  <span className="font-semibold">Query:</span>{' '}
-                  {retrieval.query}
-                </p>
+          {ragAnswer && (
+            <div className="mt-6 rounded-lg bg-gray-50 p-4 text-left">
+              <h3 className="text-md font-semibold text-gray-800">
+                Answer
+              </h3>
 
-                <p className="mt-1">
-                  <span className="font-semibold">Document ID:</span>{' '}
-                  {retrieval.document_id}
-                </p>
-
-                <p className="mt-1">
-                  <span className="font-semibold">Top-K:</span>{' '}
-                  {retrieval.top_k}
-                </p>
+              <div className="mt-2 text-gray-900">
+                <ReactMarkdown>{ragAnswer}</ReactMarkdown>
               </div>
+            </div>
+          )}
+
+          {ragSources.length > 0 && (
+            <div className="mt-6 text-left">
+              <h3 className="text-md font-semibold text-gray-800">
+                Sources ({ragSources.length})
+              </h3>
 
               <div className="mt-4 space-y-4">
-                {retrieval.results?.map((result, index) => (
+                {ragSources.map((source, index) => (
                   <div
-                    key={result.chunk_id}
+                    key={source.chunk_id || index}
                     className="rounded-lg border border-gray-200 p-4"
                   >
-                    <div className="text-sm text-gray-800">
-                      <p>
-                        <span className="font-semibold">Result:</span>{' '}
-                        {index + 1}
-                      </p>
+                    <p className="text-sm text-gray-800">
+                      <span className="font-semibold">Source:</span>{' '}
+                      {index + 1}
+                    </p>
 
-                      <p className="mt-1">
-                        <span className="font-semibold">Chunk ID:</span>{' '}
-                        {result.chunk_id}
-                      </p>
+                    <p className="mt-1 text-sm text-gray-800">
+                      <span className="font-semibold">Page:</span>{' '}
+                      {source.page}
+                    </p>
 
-                      <p className="mt-1">
-                        <span className="font-semibold">Page:</span>{' '}
-                        {result.page}
-                      </p>
-
-                      <p className="mt-1">
-                        <span className="font-semibold">Distance:</span>{' '}
-                        {result.distance}
-                      </p>
-                    </div>
-
-                    <pre className="mt-3 whitespace-pre-wrap rounded-lg bg-gray-100 p-3 text-sm text-gray-800">
-                      {result.text}
-                    </pre>
+                    <p className="mt-1 text-sm text-gray-800">
+                      <span className="font-semibold">Chunk ID:</span>{' '}
+                      {source.chunk_id}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
           )}
         </div>
-
-        <div className="mt-6">
-          <input
-            type="text"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                sendMessage()
-              }
-            }}
-            placeholder="Enter a message"
-            disabled={loading}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 disabled:opacity-50"
-          />
-
-          <button
-            onClick={sendMessage}
-            disabled={loading || !message.trim()}
-            className="mt-4 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? 'Generating...' : 'Send'}
-          </button>
-        </div>
-
-        {response && (
-          <div className="mt-6 rounded-lg bg-gray-100 p-4">
-            <p className="text-sm font-semibold text-gray-700">
-              Backend response:
-            </p>
-
-            <div className="mt-2 text-left text-gray-900">
-              <ReactMarkdown>{response}</ReactMarkdown>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
