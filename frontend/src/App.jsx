@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
+const API_BASE = 'http://127.0.0.1:8000'
+
 function App() {
   const [message, setMessage] = useState('')
   const [response, setResponse] = useState('')
@@ -8,7 +10,8 @@ function App() {
 
   const [selectedFile, setSelectedFile] = useState(null)
   const [uploading, setUploading] = useState(false)
-  const [uploadStatus, setUploadStatus] = useState('')
+  const [uploadStatus, setUploadStatus] = useState('No document selected.')
+  const [uploadError, setUploadError] = useState('')
   const [document, setDocument] = useState(null)
 
   const [retrieveQuery, setRetrieveQuery] = useState('')
@@ -16,22 +19,51 @@ function App() {
   const [retrieveError, setRetrieveError] = useState('')
   const [retrieval, setRetrieval] = useState(null)
 
+  function handleFileChange(event) {
+    const file = event.target.files?.[0] || null
+
+    setSelectedFile(null)
+    setDocument(null)
+    setUploadError('')
+    setUploadStatus('No document selected.')
+    setRetrieval(null)
+    setRetrieveError('')
+
+    if (!file) {
+      return
+    }
+
+    if (
+      file.type !== 'application/pdf' &&
+      !file.name.toLowerCase().endsWith('.pdf')
+    ) {
+      setUploadError('Only PDF files are supported.')
+      return
+    }
+
+    setSelectedFile(file)
+    setUploadStatus('PDF selected. Ready to upload.')
+  }
+
   async function uploadDocument() {
     if (!selectedFile || uploading) {
       return
     }
 
     setUploading(true)
-    setUploadStatus('')
+    setUploadError('')
     setDocument(null)
     setRetrieval(null)
     setRetrieveError('')
+    setUploadStatus('Uploading...')
 
     try {
       const formData = new FormData()
       formData.append('file', selectedFile)
 
-      const res = await fetch('http://127.0.0.1:8000/upload', {
+      setUploadStatus('Indexing...')
+
+      const res = await fetch(`${API_BASE}/upload`, {
         method: 'POST',
         body: formData,
       })
@@ -41,6 +73,7 @@ function App() {
 
         try {
           const errorData = await res.json()
+
           if (errorData.detail) {
             detail = errorData.detail
           }
@@ -54,9 +87,10 @@ function App() {
       const data = await res.json()
 
       setDocument(data)
-      setUploadStatus('Upload successful.')
+      setUploadStatus('Indexed successfully. Status: Ready.')
     } catch (error) {
-      setUploadStatus(`Upload failed: ${error.message}`)
+      setUploadError(error.message)
+      setUploadStatus('Upload failed.')
     } finally {
       setUploading(false)
     }
@@ -74,7 +108,7 @@ function App() {
     setRetrieval(null)
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/retrieve', {
+      const res = await fetch(`${API_BASE}/api/retrieve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,6 +125,7 @@ function App() {
 
         try {
           const errorData = await res.json()
+
           if (errorData.detail) {
             detail = errorData.detail
           }
@@ -121,7 +156,7 @@ function App() {
     setResponse('')
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/chat', {
+      const res = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +218,7 @@ function App() {
         </h1>
 
         <p className="mt-2 text-gray-600">
-          Part 4 — Retrieval Inspection
+          Part 6 — Browser Vertical Slice
         </p>
 
         <div className="mt-6 rounded-lg border border-gray-200 p-4">
@@ -194,13 +229,7 @@ function App() {
           <input
             type="file"
             accept=".pdf,application/pdf"
-            onChange={(event) => {
-              setSelectedFile(event.target.files?.[0] || null)
-              setUploadStatus('')
-              setDocument(null)
-              setRetrieval(null)
-              setRetrieveError('')
-            }}
+            onChange={handleFileChange}
             disabled={uploading}
             className="mt-3 w-full text-sm"
           />
@@ -210,18 +239,27 @@ function App() {
             disabled={uploading || !selectedFile}
             className="mt-4 rounded-lg bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-50"
           >
-            {uploading ? 'Uploading...' : 'Upload PDF'}
+            {uploading ? 'Indexing...' : 'Upload PDF'}
           </button>
 
-          {uploadStatus && (
-            <p className="mt-3 text-sm text-gray-700">
-              {uploadStatus}
+          <p className="mt-3 text-sm text-gray-700">
+            <span className="font-semibold">Status:</span>{' '}
+            {uploadStatus}
+          </p>
+
+          {uploadError && (
+            <p className="mt-2 text-sm text-red-600">
+              {uploadError}
             </p>
           )}
 
           {document && (
             <div className="mt-4 rounded-lg bg-gray-100 p-4 text-left text-sm text-gray-800">
               <p>
+                <span className="font-semibold">Status:</span> Ready
+              </p>
+
+              <p className="mt-1">
                 <span className="font-semibold">Document:</span>{' '}
                 {document.document_name}
               </p>
@@ -240,6 +278,21 @@ function App() {
                 <span className="font-semibold">Pages with text:</span>{' '}
                 {document.pages_with_text}
               </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Chunks:</span>{' '}
+                {document.chunk_count}
+              </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Embeddings:</span>{' '}
+                {document.embedding_count}
+              </p>
+
+              <p className="mt-1">
+                <span className="font-semibold">Stored:</span>{' '}
+                {document.stored_count}
+              </p>
             </div>
           )}
         </div>
@@ -250,7 +303,8 @@ function App() {
           </h2>
 
           <p className="mt-1 text-sm text-gray-600">
-            Diagnostic retrieval only. No LLM generation is performed here.
+            Existing diagnostic retrieval interface. RAG question flow will be
+            added in WP6-B.
           </p>
 
           <input
@@ -318,30 +372,22 @@ function App() {
                   >
                     <div className="text-sm text-gray-800">
                       <p>
-                        <span className="font-semibold">
-                          Result:
-                        </span>{' '}
+                        <span className="font-semibold">Result:</span>{' '}
                         {index + 1}
                       </p>
 
                       <p className="mt-1">
-                        <span className="font-semibold">
-                          Chunk ID:
-                        </span>{' '}
+                        <span className="font-semibold">Chunk ID:</span>{' '}
                         {result.chunk_id}
                       </p>
 
                       <p className="mt-1">
-                        <span className="font-semibold">
-                          Page:
-                        </span>{' '}
+                        <span className="font-semibold">Page:</span>{' '}
                         {result.page}
                       </p>
 
                       <p className="mt-1">
-                        <span className="font-semibold">
-                          Distance:
-                        </span>{' '}
+                        <span className="font-semibold">Distance:</span>{' '}
                         {result.distance}
                       </p>
                     </div>
