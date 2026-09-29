@@ -26,3 +26,6 @@ Thumbs.db
 backend/uploads/
 
 backend/chroma_db/
+evaluation/results/
+evaluation/results/*
+!evaluation/results/.gitkeep

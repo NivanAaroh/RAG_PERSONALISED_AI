@@ -1,0 +1,26 @@
+{
+  "dataset_version": "day2-part1-smoke-v1",
+  "corpus": {
+    "document_id": "wp3-test"
+  },
+  "cases": [
+    {
+      "id": "smoke-001",
+      "question": "What is retrieval-augmented generation (RAG)?",
+      "support_status": "supported",
+      "required_evidence": [
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p2:c1",
+          "page": 2
+        }
+      ]
+    },
+    {
+      "id": "smoke-002",
+      "question": "What is the capital of France?",
+      "support_status": "unsupported",
+      "required_evidence": []
+    }
+  ]
+}
