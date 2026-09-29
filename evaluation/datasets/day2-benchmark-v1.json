@@ -1,0 +1,247 @@
+{
+  "dataset_version": "day2-benchmark-v1",
+  "description": "Day 2 diagnostic evaluation benchmark for the frozen Day 1 controlled corpus.",
+  "corpus": {
+    "document_id": "wp3-test"
+  },
+  "cases": [
+    {
+      "id": "d2-001",
+      "question": "What is retrieval-augmented generation (RAG)?",
+      "support_status": "supported",
+      "category": "direct_factual",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c1", "page": 2}
+      ]
+    },
+    {
+      "id": "d2-002",
+      "question": "What is information retrieval?",
+      "support_status": "supported",
+      "category": "direct_factual",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c0", "page": 3}
+      ]
+    },
+    {
+      "id": "d2-003",
+      "question": "What are the two major components of a RAG system?",
+      "support_status": "supported",
+      "category": "direct_factual",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c1", "page": 16}
+      ]
+    },
+    {
+      "id": "d2-004",
+      "question": "How does RAG use external knowledge to improve factual question answering?",
+      "support_status": "supported",
+      "category": "paraphrased",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c1", "page": 2},
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17}
+      ]
+    },
+    {
+      "id": "d2-005",
+      "question": "Why can simply prompting a language model be unreliable for factual answers?",
+      "support_status": "supported",
+      "category": "paraphrased",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c0", "page": 2}
+      ]
+    },
+    {
+      "id": "d2-006",
+      "question": "How are dense retrieval methods different from classic tf-idf or BM25 retrieval?",
+      "support_status": "supported",
+      "category": "paraphrased",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p13:c0", "page": 13},
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c1", "page": 3}
+      ]
+    },
+    {
+      "id": "d2-007",
+      "question": "What is the purpose of a reranker in some RAG architectures?",
+      "support_status": "supported",
+      "category": "multi-chunk",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p18:c0", "page": 18}
+      ]
+    },
+    {
+      "id": "d2-008",
+      "question": "What two stages are used in the standard RAG model shown in the chapter?",
+      "support_status": "supported",
+      "category": "multi-chunk",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17},
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c1", "page": 16}
+      ]
+    },
+    {
+      "id": "d2-009",
+      "question": "What is the difference between open-book QA and closed-book QA?",
+      "support_status": "supported",
+      "category": "multi-chunk",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p19:c1", "page": 19}
+      ]
+    },
+    {
+      "id": "d2-010",
+      "question": "Which model is associated with the MaxSim relevance-scoring approach described in the chapter?",
+      "support_status": "supported",
+      "category": "entity_name",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p15:c0", "page": 15}
+      ]
+    },
+    {
+      "id": "d2-011",
+      "question": "Who are the authors of Speech and Language Processing cited at the beginning of the controlled chapter?",
+      "support_status": "supported",
+      "category": "entity_name",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p1:c0", "page": 1}
+      ]
+    },
+    {
+      "id": "d2-012",
+      "question": "What values do Manning et al. suggest for k and b in BM25?",
+      "support_status": "supported",
+      "category": "numerical_date",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c0", "page": 9}
+      ]
+    },
+    {
+      "id": "d2-013",
+      "question": "What is the recall value at rank 25 in Figure 11.7?", "support_status": "supported", "category": "numerical_date", "required_evidence": [{"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}]
+    },
+    {
+      "id": "d2-014",
+      "question": "What does BM25 use in addition to inverse document frequency?",
+      "support_status": "supported",
+      "category": "keyword_heavy",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c0", "page": 9}
+      ]
+    },
+    {
+      "id": "d2-015",
+      "question": "What is a postings list in an inverted index?",
+      "support_status": "supported",
+      "category": "keyword_heavy",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c1", "page": 9}
+      ]
+    },
+    {
+      "id": "d2-016",
+      "question": "Which document was the source of the value 1791 for the premiere of The Magic Flute?",
+      "support_status": "unsupported",
+      "category": "ambiguous",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-017",
+      "question": "What was the exact number of questions in the GEOQUERY dataset?",
+      "support_status": "unsupported",
+      "category": "unsupported",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-018",
+      "question": "What is the current production version of the RAG system described in this chapter?",
+      "support_status": "unsupported",
+      "category": "unsupported",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-019",
+      "question": "What was the BM25 value of k used in an experiment conducted specifically by the authors of this chapter?",
+      "support_status": "unsupported",
+      "category": "near_match",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-020",
+      "question": "What value of b was used for BM25 in the authors' own production system?",
+      "support_status": "unsupported",
+      "category": "near_match",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-021",
+      "question": "Which exact RAG architecture should be deployed in production according to the chapter?",
+      "support_status": "unsupported",
+      "category": "near_match",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-022",
+      "question": "What are the exact precision and recall values at rank 10 in Figure 11.7?",
+      "support_status": "supported",
+      "category": "partial_evidence",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}
+      ]
+    },
+    {
+      "id": "d2-023",
+      "question": "What are the precision values at ranks 1, 5, and 25 in Figure 11.7?",
+      "support_status": "supported",
+      "category": "multi_part_partial",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}
+      ]
+    },
+    {
+      "id": "d2-024",
+      "question": "What is the difference between sparse and dense retrieval in terms of how documents and queries are represented?",
+      "support_status": "supported",
+      "category": "entity_confusion",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c1", "page": 3},
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p4:c0", "page": 4}
+      ]
+    },
+    {
+      "id": "d2-025",
+      "question": "What does the chapter say about the relationship between retrieval and generation in RAG?",
+      "support_status": "supported",
+      "category": "paraphrased",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17}
+      ]
+    },
+    {
+      "id": "d2-026",
+      "question": "What is the difference between relevant retrieved passages and passages that are sufficient to establish an answer?",
+      "support_status": "unsupported",
+      "category": "near_match",
+      "required_evidence": []
+    },
+    {
+      "id": "d2-027",
+      "question": "Which named benchmark is described as containing gold positive examples for supervised retrieval algorithms?",
+      "support_status": "supported",
+      "category": "entity_name",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c0", "page": 16}
+      ]
+    },
+    {
+      "id": "d2-028",
+      "question": "What is mean average precision (MAP) and how is it obtained from average precision values?",
+      "support_status": "supported",
+      "category": "multi_chunk",
+      "required_evidence": [
+        {"document_id": "wp3-test", "chunk_id": "wp3-test:p12:c1", "page": 12}
+      ]
+    }
+  ]
+}
+

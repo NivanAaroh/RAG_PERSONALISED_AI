@@ -53,8 +53,7 @@ def run(dataset_path: str, top_k: int, output_path: str) -> None:
         result = {
             "case_id": case.case_id,
             "question": case.question,
-            "support_status": case.support_status,
-            "required_evidence": [
+            "support_status": case.support_status,            "required_evidence": [
                 {
                     "document_id": item.document_id,
                     "chunk_id": item.chunk_id,
