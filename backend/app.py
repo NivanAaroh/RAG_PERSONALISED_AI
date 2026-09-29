@@ -1,12 +1,20 @@
-from fastapi import FastAPI, HTTPException
+from pathlib import Path
+from uuid import uuid4
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
+from backend.ingestion import ingest_pdf
 from backend.llm import generate_response
 
 
 app = FastAPI(title="RAG Personalised AI")
+
+
+UPLOAD_DIR = Path(__file__).resolve().parent / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 app.add_middleware(
@@ -32,6 +40,60 @@ class ChatRequest(BaseModel):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="No file provided.",
+        )
+
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported.",
+        )
+
+    document_id = str(uuid4())
+    document_name = Path(file.filename).name
+    destination = UPLOAD_DIR / f"{document_id}.pdf"
+
+    try:
+        contents = await file.read()
+        destination.write_bytes(contents)
+
+        document = ingest_pdf(
+            destination,
+            document_id=document_id,
+            document_name=document_name,
+        )
+
+        pages_with_text = sum(
+            1
+            for page in document["pages"]
+            if page["text"]
+        )
+
+        return {
+            "document_id": document["document_id"],
+            "document_name": document["document_name"],
+            "page_count": document["page_count"],
+            "pages_with_text": pages_with_text,
+        }
+
+    except Exception as exc:
+        if destination.exists():
+            destination.unlink()
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"PDF ingestion failed: {exc}",
+        ) from exc
+
+    finally:
+        await file.close()
 
 
 @app.post("/chat")
