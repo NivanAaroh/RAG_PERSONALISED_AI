@@ -24,3 +24,5 @@ frontend/dist/
 Thumbs.db
 # Uploaded PDF files
 backend/uploads/
+
+backend/chroma_db/

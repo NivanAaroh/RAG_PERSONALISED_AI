@@ -7,6 +7,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
 from backend.ingestion import ingest_pdf
+from backend.chunking import chunk_document
+from backend.embeddings import embed_chunks
+from backend.vector_store import upsert_chunks
 from backend.llm import generate_response
 
 
@@ -76,11 +79,27 @@ async def upload_document(file: UploadFile = File(...)):
             if page["text"]
         )
 
+        chunks = chunk_document(
+            document["document_id"],
+            document["document_name"],
+            document["pages"],
+        )
+
+        embeddings = embed_chunks(chunks)
+
+        stored_count = upsert_chunks(
+            chunks,
+            embeddings,
+        )
+
         return {
             "document_id": document["document_id"],
             "document_name": document["document_name"],
             "page_count": document["page_count"],
             "pages_with_text": pages_with_text,
+            "chunk_count": len(chunks),
+            "embedding_count": len(embeddings),
+            "stored_count": stored_count,
         }
 
     except Exception as exc:
