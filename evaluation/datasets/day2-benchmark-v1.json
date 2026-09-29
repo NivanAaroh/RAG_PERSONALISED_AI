@@ -11,7 +11,11 @@
       "support_status": "supported",
       "category": "direct_factual",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c1", "page": 2}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p2:c1",
+          "page": 2
+        }
       ]
     },
     {
@@ -20,7 +24,11 @@
       "support_status": "supported",
       "category": "direct_factual",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c0", "page": 3}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p3:c0",
+          "page": 3
+        }
       ]
     },
     {
@@ -29,7 +37,11 @@
       "support_status": "supported",
       "category": "direct_factual",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c1", "page": 16}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p16:c1",
+          "page": 16
+        }
       ]
     },
     {
@@ -38,8 +50,16 @@
       "support_status": "supported",
       "category": "paraphrased",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c1", "page": 2},
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p2:c1",
+          "page": 2
+        },
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p17:c0",
+          "page": 17
+        }
       ]
     },
     {
@@ -48,7 +68,11 @@
       "support_status": "supported",
       "category": "paraphrased",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p2:c0", "page": 2}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p2:c0",
+          "page": 2
+        }
       ]
     },
     {
@@ -57,8 +81,16 @@
       "support_status": "supported",
       "category": "paraphrased",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p13:c0", "page": 13},
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c1", "page": 3}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p13:c0",
+          "page": 13
+        },
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p3:c1",
+          "page": 3
+        }
       ]
     },
     {
@@ -67,7 +99,11 @@
       "support_status": "supported",
       "category": "multi-chunk",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p18:c0", "page": 18}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p18:c0",
+          "page": 18
+        }
       ]
     },
     {
@@ -76,8 +112,16 @@
       "support_status": "supported",
       "category": "multi-chunk",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17},
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c1", "page": 16}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p17:c0",
+          "page": 17
+        },
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p16:c1",
+          "page": 16
+        }
       ]
     },
     {
@@ -86,7 +130,11 @@
       "support_status": "supported",
       "category": "multi-chunk",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p19:c1", "page": 19}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p19:c1",
+          "page": 19
+        }
       ]
     },
     {
@@ -95,7 +143,11 @@
       "support_status": "supported",
       "category": "entity_name",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p15:c0", "page": 15}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p15:c0",
+          "page": 15
+        }
       ]
     },
     {
@@ -104,7 +156,11 @@
       "support_status": "supported",
       "category": "entity_name",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p1:c0", "page": 1}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p1:c0",
+          "page": 1
+        }
       ]
     },
     {
@@ -113,12 +169,25 @@
       "support_status": "supported",
       "category": "numerical_date",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c0", "page": 9}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p9:c0",
+          "page": 9
+        }
       ]
     },
     {
       "id": "d2-013",
-      "question": "What is the recall value at rank 25 in Figure 11.7?", "support_status": "supported", "category": "numerical_date", "required_evidence": [{"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}]
+      "question": "What is the recall value at rank 25 in Figure 11.7?",
+      "support_status": "supported",
+      "category": "numerical_date",
+      "required_evidence": [
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p11:c0",
+          "page": 11
+        }
+      ]
     },
     {
       "id": "d2-014",
@@ -126,7 +195,11 @@
       "support_status": "supported",
       "category": "keyword_heavy",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c0", "page": 9}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p9:c0",
+          "page": 9
+        }
       ]
     },
     {
@@ -135,7 +208,11 @@
       "support_status": "supported",
       "category": "keyword_heavy",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p9:c1", "page": 9}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p9:c1",
+          "page": 9
+        }
       ]
     },
     {
@@ -186,7 +263,11 @@
       "support_status": "supported",
       "category": "partial_evidence",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p11:c0",
+          "page": 11
+        }
       ]
     },
     {
@@ -195,7 +276,11 @@
       "support_status": "supported",
       "category": "multi_part_partial",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p11:c0", "page": 11}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p11:c0",
+          "page": 11
+        }
       ]
     },
     {
@@ -204,8 +289,11 @@
       "support_status": "supported",
       "category": "entity_confusion",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p3:c1", "page": 3},
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p4:c0", "page": 4}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p3:c1",
+          "page": 3
+        }
       ]
     },
     {
@@ -214,7 +302,11 @@
       "support_status": "supported",
       "category": "paraphrased",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p17:c0", "page": 17}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p17:c0",
+          "page": 17
+        }
       ]
     },
     {
@@ -230,7 +322,11 @@
       "support_status": "supported",
       "category": "entity_name",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p16:c0", "page": 16}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p16:c0",
+          "page": 16
+        }
       ]
     },
     {
@@ -239,9 +335,12 @@
       "support_status": "supported",
       "category": "multi_chunk",
       "required_evidence": [
-        {"document_id": "wp3-test", "chunk_id": "wp3-test:p12:c1", "page": 12}
+        {
+          "document_id": "wp3-test",
+          "chunk_id": "wp3-test:p12:c1",
+          "page": 12
+        }
       ]
     }
   ]
 }
-
