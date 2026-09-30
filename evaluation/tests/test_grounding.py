@@ -1,7 +1,9 @@
-import unittest
+﻿import unittest
 
 from evaluation.grounding import (
+    EvidenceRequirement,
     REFUSAL_TEXT,
+    assess_evidence,
     evaluate_grounding,
     instruction_like_text_is_data,
     validate_provenance,
@@ -24,7 +26,21 @@ def chunk(
 
 class GroundingTests(unittest.TestCase):
 
-    def test_sufficient_evidence_invokes_llm_and_preserves_provenance(self):
+    def requirement(
+        self,
+        evidence_id="ev-1",
+        requirement="The document establishes the definition.",
+        chunk_ids=("wp3-test:p2:c1",),
+        pages=(2,),
+    ):
+        return EvidenceRequirement(
+            evidence_id=evidence_id,
+            requirement=requirement,
+            supporting_chunk_ids=chunk_ids,
+            supporting_pages=pages,
+        )
+
+    def test_complete_evidence_invokes_llm_and_preserves_provenance(self):
         calls = []
 
         def fake_llm(messages):
@@ -34,6 +50,9 @@ class GroundingTests(unittest.TestCase):
         result = evaluate_grounding(
             "What is retrieval augmented generation?",
             [chunk()],
+            required_evidence=[
+                self.requirement(),
+            ],
             llm=fake_llm,
         )
 
@@ -44,6 +63,12 @@ class GroundingTests(unittest.TestCase):
         self.assertEqual(result.answer, "Grounded answer.")
         self.assertEqual(len(calls), 1)
         self.assertTrue(result.provenance_valid)
+        self.assertEqual(result.assessment.coverage, 1.0)
+        self.assertEqual(
+            result.assessment.supported_evidence,
+            ("ev-1",),
+        )
+        self.assertEqual(result.assessment.missing_evidence, ())
         self.assertEqual(
             result.sources,
             [
@@ -56,18 +81,22 @@ class GroundingTests(unittest.TestCase):
             ],
         )
 
-    def test_insufficient_evidence_refuses_without_llm(self):
+    def test_missing_requirement_refuses_without_llm(self):
         calls = []
 
         def fake_llm(messages):
             calls.append(messages)
-            return "This must never be returned."
+            return "Must not run."
 
         result = evaluate_grounding(
-            "What is the exact number of questions in GEOQUERY?",
-            [
-                chunk(
-                    text="Retrieval systems use sparse and dense representations."
+            "What is GEOQUERY?",
+            [chunk()],
+            required_evidence=[
+                self.requirement(
+                    evidence_id="geoquery-count",
+                    requirement="The exact number of GEOQUERY questions.",
+                    chunk_ids=("wp3-test:p99:c0",),
+                    pages=(99,),
                 )
             ],
             llm=fake_llm,
@@ -75,65 +104,151 @@ class GroundingTests(unittest.TestCase):
 
         self.assertFalse(result.sufficient_evidence)
         self.assertFalse(result.llm_invoked)
-        self.assertTrue(result.grounded)
         self.assertTrue(result.refusal)
         self.assertEqual(result.answer, REFUSAL_TEXT)
         self.assertEqual(result.sources, [])
-        self.assertTrue(result.provenance_valid)
         self.assertEqual(calls, [])
+        self.assertEqual(result.assessment.coverage, 0.0)
+        self.assertEqual(
+            result.assessment.missing_evidence,
+            ("geoquery-count",),
+        )
 
-    def test_partial_evidence_still_uses_existing_gate(self):
-        calls = []
-
-        def fake_llm(messages):
-            calls.append(messages)
-            return "Partial answer."
-
+    def test_partial_evidence_refuses(self):
         result = evaluate_grounding(
             "What are the exact precision and recall values at rank 10?",
             [
                 chunk(
                     chunk_id="wp3-test:p11:c0",
                     page=11,
-                    text=(
-                        "Figure 11.7 shows precision and recall "
-                        "at several ranks."
-                    ),
+                    text="Figure 11.7 shows precision and recall at several ranks.",
                 )
             ],
-            llm=fake_llm,
-        )
-
-        self.assertTrue(result.sufficient_evidence)
-        self.assertTrue(result.llm_invoked)
-        self.assertEqual(len(calls), 1)
-
-    def test_wrong_entity_can_be_refused(self):
-        calls = []
-
-        def fake_llm(messages):
-            calls.append(messages)
-            return "Wrong entity answer."
-
-        result = evaluate_grounding(
-            "Which model is associated with the MaxSim approach?",
-            [
-                chunk(
-                    chunk_id="wp3-test:p3:c0",
-                    page=3,
-                    text=(
-                        "Information retrieval finds relevant "
-                        "documents for a query."
-                    ),
-                )
+            required_evidence=[
+                self.requirement(
+                    evidence_id="precision",
+                    requirement="Exact precision value at rank 10.",
+                    chunk_ids=("wp3-test:p11:c0",),
+                    pages=(11,),
+                ),
+                self.requirement(
+                    evidence_id="recall",
+                    requirement="Exact recall value at rank 10.",
+                    chunk_ids=("wp3-test:p11:c1",),
+                    pages=(11,),
+                ),
             ],
-            llm=fake_llm,
+            llm=lambda messages: "Must not run.",
         )
 
         self.assertFalse(result.sufficient_evidence)
         self.assertFalse(result.llm_invoked)
         self.assertTrue(result.refusal)
-        self.assertEqual(calls, [])
+        self.assertEqual(result.assessment.coverage, 0.5)
+        self.assertEqual(
+            result.assessment.supported_evidence,
+            ("precision",),
+        )
+        self.assertEqual(
+            result.assessment.missing_evidence,
+            ("recall",),
+        )
+
+    def test_multi_part_complete_evidence_invokes_llm(self):
+        result = evaluate_grounding(
+            "Explain the two required parts.",
+            [
+                chunk(
+                    chunk_id="wp3-test:p2:c1",
+                    page=2,
+                ),
+                chunk(
+                    chunk_id="wp3-test:p17:c0",
+                    page=17,
+                    text="RAG systems retrieve external knowledge.",
+                ),
+            ],
+            required_evidence=[
+                self.requirement(
+                    evidence_id="part-a",
+                    chunk_ids=("wp3-test:p2:c1",),
+                    pages=(2,),
+                ),
+                self.requirement(
+                    evidence_id="part-b",
+                    chunk_ids=("wp3-test:p17:c0",),
+                    pages=(17,),
+                ),
+            ],
+            llm=lambda messages: "Complete answer.",
+        )
+
+        self.assertTrue(result.sufficient_evidence)
+        self.assertTrue(result.llm_invoked)
+        self.assertEqual(result.assessment.coverage, 1.0)
+
+    def test_wrong_entity_supporting_chunk_mismatch_refuses(self):
+        result = evaluate_grounding(
+            "Which model is associated with MaxSim?",
+            [
+                chunk(
+                    chunk_id="wp3-test:p3:c0",
+                    page=3,
+                    text="Information retrieval finds relevant documents.",
+                )
+            ],
+            required_evidence=[
+                self.requirement(
+                    evidence_id="maxsim-model",
+                    requirement="The model associated with MaxSim.",
+                    chunk_ids=("wp3-test:p15:c0",),
+                    pages=(15,),
+                    ),
+            ],
+            llm=lambda messages: "Wrong entity answer.",
+        )
+
+        self.assertFalse(result.sufficient_evidence)
+        self.assertFalse(result.llm_invoked)
+        self.assertTrue(result.refusal)
+
+    def test_assessment_reason_is_inspectable(self):
+        assessment = assess_evidence(
+            [
+                chunk(),
+            ],
+            [
+                self.requirement(),
+                self.requirement(
+                    evidence_id="missing",
+                    requirement="Another required fact.",
+                    chunk_ids=("wp3-test:p9:c0",),
+                    pages=(9,),
+                ),
+            ],
+        )
+
+        self.assertEqual(assessment.coverage, 0.5)
+        self.assertIn("incomplete", assessment.assessment_reason)
+        self.assertEqual(
+            assessment.supported_evidence,
+            ("ev-1",),
+        )
+        self.assertEqual(
+            assessment.missing_evidence,
+            ("missing",),
+        )
+
+    def test_empty_requirements_are_insufficient(self):
+        assessment = assess_evidence(
+            [chunk()],
+            [],
+        )
+
+        self.assertFalse(assessment.sufficient)
+        self.assertEqual(assessment.coverage, 0.0)
+        self.assertEqual(assessment.supported_evidence, ())
+        self.assertEqual(assessment.missing_evidence, ())
 
     def test_provenance_matches_retrieved_metadata(self):
         evidence = [
@@ -194,6 +309,9 @@ class GroundingTests(unittest.TestCase):
         result = evaluate_grounding(
             "What is retrieval?",
             [],
+            required_evidence=[
+                self.requirement(),
+            ],
             llm=fake_llm,
         )
 

@@ -16,6 +16,18 @@
           "chunk_id": "wp3-test:p2:c1",
           "page": 2
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-001-ev-1",
+          "requirement": "Required evidence for d2-001 from wp3-test:p2:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p2:c1"
+          ],
+          "supporting_pages": [
+            2
+          ]
+        }
       ]
     },
     {
@@ -29,6 +41,18 @@
           "chunk_id": "wp3-test:p3:c0",
           "page": 3
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-002-ev-1",
+          "requirement": "Required evidence for d2-002 from wp3-test:p3:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p3:c0"
+          ],
+          "supporting_pages": [
+            3
+          ]
+        }
       ]
     },
     {
@@ -41,6 +65,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p16:c1",
           "page": 16
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-003-ev-1",
+          "requirement": "Required evidence for d2-003 from wp3-test:p16:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p16:c1"
+          ],
+          "supporting_pages": [
+            16
+          ]
         }
       ]
     },
@@ -60,6 +96,28 @@
           "chunk_id": "wp3-test:p17:c0",
           "page": 17
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-004-ev-1",
+          "requirement": "Required evidence for d2-004 from wp3-test:p2:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p2:c1"
+          ],
+          "supporting_pages": [
+            2
+          ]
+        },
+        {
+          "evidence_id": "d2-004-ev-2",
+          "requirement": "Required evidence for d2-004 from wp3-test:p17:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p17:c0"
+          ],
+          "supporting_pages": [
+            17
+          ]
+        }
       ]
     },
     {
@@ -72,6 +130,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p2:c0",
           "page": 2
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-005-ev-1",
+          "requirement": "Required evidence for d2-005 from wp3-test:p2:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p2:c0"
+          ],
+          "supporting_pages": [
+            2
+          ]
         }
       ]
     },
@@ -91,6 +161,28 @@
           "chunk_id": "wp3-test:p3:c1",
           "page": 3
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-006-ev-1",
+          "requirement": "Required evidence for d2-006 from wp3-test:p13:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p13:c0"
+          ],
+          "supporting_pages": [
+            13
+          ]
+        },
+        {
+          "evidence_id": "d2-006-ev-2",
+          "requirement": "Required evidence for d2-006 from wp3-test:p3:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p3:c1"
+          ],
+          "supporting_pages": [
+            3
+          ]
+        }
       ]
     },
     {
@@ -103,6 +195,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p18:c0",
           "page": 18
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-007-ev-1",
+          "requirement": "Required evidence for d2-007 from wp3-test:p18:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p18:c0"
+          ],
+          "supporting_pages": [
+            18
+          ]
         }
       ]
     },
@@ -122,6 +226,28 @@
           "chunk_id": "wp3-test:p16:c1",
           "page": 16
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-008-ev-1",
+          "requirement": "Required evidence for d2-008 from wp3-test:p17:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p17:c0"
+          ],
+          "supporting_pages": [
+            17
+          ]
+        },
+        {
+          "evidence_id": "d2-008-ev-2",
+          "requirement": "Required evidence for d2-008 from wp3-test:p16:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p16:c1"
+          ],
+          "supporting_pages": [
+            16
+          ]
+        }
       ]
     },
     {
@@ -134,6 +260,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p19:c1",
           "page": 19
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-009-ev-1",
+          "requirement": "Required evidence for d2-009 from wp3-test:p19:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p19:c1"
+          ],
+          "supporting_pages": [
+            19
+          ]
         }
       ]
     },
@@ -148,6 +286,18 @@
           "chunk_id": "wp3-test:p15:c0",
           "page": 15
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-010-ev-1",
+          "requirement": "Required evidence for d2-010 from wp3-test:p15:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p15:c0"
+          ],
+          "supporting_pages": [
+            15
+          ]
+        }
       ]
     },
     {
@@ -160,6 +310,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p1:c0",
           "page": 1
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-011-ev-1",
+          "requirement": "Required evidence for d2-011 from wp3-test:p1:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p1:c0"
+          ],
+          "supporting_pages": [
+            1
+          ]
         }
       ]
     },
@@ -174,6 +336,18 @@
           "chunk_id": "wp3-test:p9:c0",
           "page": 9
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-012-ev-1",
+          "requirement": "Required evidence for d2-012 from wp3-test:p9:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p9:c0"
+          ],
+          "supporting_pages": [
+            9
+          ]
+        }
       ]
     },
     {
@@ -186,6 +360,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p11:c0",
           "page": 11
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-013-ev-1",
+          "requirement": "Required evidence for d2-013 from wp3-test:p11:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p11:c0"
+          ],
+          "supporting_pages": [
+            11
+          ]
         }
       ]
     },
@@ -200,6 +386,18 @@
           "chunk_id": "wp3-test:p9:c0",
           "page": 9
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-014-ev-1",
+          "requirement": "Required evidence for d2-014 from wp3-test:p9:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p9:c0"
+          ],
+          "supporting_pages": [
+            9
+          ]
+        }
       ]
     },
     {
@@ -213,6 +411,18 @@
           "chunk_id": "wp3-test:p9:c1",
           "page": 9
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-015-ev-1",
+          "requirement": "Required evidence for d2-015 from wp3-test:p9:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p9:c1"
+          ],
+          "supporting_pages": [
+            9
+          ]
+        }
       ]
     },
     {
@@ -220,42 +430,90 @@
       "question": "Which document was the source of the value 1791 for the premiere of The Magic Flute?",
       "support_status": "unsupported",
       "category": "ambiguous",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-016-ev-1",
+          "requirement": "The document source that establishes the value 1791 for the premiere of The Magic Flute.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-017",
       "question": "What was the exact number of questions in the GEOQUERY dataset?",
       "support_status": "unsupported",
       "category": "unsupported",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-017-ev-1",
+          "requirement": "The exact number of questions in the GEOQUERY dataset.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-018",
       "question": "What is the current production version of the RAG system described in this chapter?",
       "support_status": "unsupported",
       "category": "unsupported",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-018-ev-1",
+          "requirement": "The current production version of the RAG system described in the chapter.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-019",
       "question": "What was the BM25 value of k used in an experiment conducted specifically by the authors of this chapter?",
       "support_status": "unsupported",
       "category": "near_match",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-019-ev-1",
+          "requirement": "The BM25 k value used in an experiment specifically conducted by the authors of this chapter.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-020",
       "question": "What value of b was used for BM25 in the authors' own production system?",
       "support_status": "unsupported",
       "category": "near_match",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-020-ev-1",
+          "requirement": "The BM25 b value used in the authors' own production system.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-021",
       "question": "Which exact RAG architecture should be deployed in production according to the chapter?",
       "support_status": "unsupported",
       "category": "near_match",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-021-ev-1",
+          "requirement": "The exact RAG architecture that should be deployed in production according to the chapter.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-022",
@@ -267,6 +525,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p11:c0",
           "page": 11
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-022-ev-1",
+          "requirement": "Required evidence for d2-022 from wp3-test:p11:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p11:c0"
+          ],
+          "supporting_pages": [
+            11
+          ]
         }
       ]
     },
@@ -281,6 +551,18 @@
           "chunk_id": "wp3-test:p11:c0",
           "page": 11
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-023-ev-1",
+          "requirement": "Required evidence for d2-023 from wp3-test:p11:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p11:c0"
+          ],
+          "supporting_pages": [
+            11
+          ]
+        }
       ]
     },
     {
@@ -293,6 +575,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p3:c1",
           "page": 3
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-024-ev-1",
+          "requirement": "Required evidence for d2-024 from wp3-test:p3:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p3:c1"
+          ],
+          "supporting_pages": [
+            3
+          ]
         }
       ]
     },
@@ -307,6 +601,18 @@
           "chunk_id": "wp3-test:p17:c0",
           "page": 17
         }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-025-ev-1",
+          "requirement": "Required evidence for d2-025 from wp3-test:p17:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p17:c0"
+          ],
+          "supporting_pages": [
+            17
+          ]
+        }
       ]
     },
     {
@@ -314,7 +620,15 @@
       "question": "What is the difference between relevant retrieved passages and passages that are sufficient to establish an answer?",
       "support_status": "unsupported",
       "category": "near_match",
-      "required_evidence": []
+      "required_evidence": [],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-026-ev-1",
+          "requirement": "The distinction between relevant retrieved passages and passages sufficient to establish an answer.",
+          "supporting_chunk_ids": [],
+          "supporting_pages": []
+        }
+      ]
     },
     {
       "id": "d2-027",
@@ -326,6 +640,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p16:c0",
           "page": 16
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-027-ev-1",
+          "requirement": "Required evidence for d2-027 from wp3-test:p16:c0.",
+          "supporting_chunk_ids": [
+            "wp3-test:p16:c0"
+          ],
+          "supporting_pages": [
+            16
+          ]
         }
       ]
     },
@@ -339,6 +665,18 @@
           "document_id": "wp3-test",
           "chunk_id": "wp3-test:p12:c1",
           "page": 12
+        }
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_id": "d2-028-ev-1",
+          "requirement": "Required evidence for d2-028 from wp3-test:p12:c1.",
+          "supporting_chunk_ids": [
+            "wp3-test:p12:c1"
+          ],
+          "supporting_pages": [
+            12
+          ]
         }
       ]
     }
