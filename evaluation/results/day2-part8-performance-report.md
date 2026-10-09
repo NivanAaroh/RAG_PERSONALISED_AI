@@ -84,7 +84,7 @@ Recorded checks for this measurement stage:
 - Dense case records use `case_id`; Hybrid/RRF and Cross-Encoder case records use `id`.
 - All three local result artifacts record the same Git revision: `a494e49d8f35de55dffc739b16e8d34dc6a8950c`.
 - The original report commit did not include the three JSON artifacts; they were ignored by Git and absent from that commit and the inspected Git history.
-- The corrective commit will add those three existing artifacts alongside this report; their inclusion must be verified against the corrective commit and remote branch.
+- The three existing JSON result artifacts were added in corrective commit `f06977a4ab33617c57d66d475955937868941009`. The committed four-file scope and remote branch synchronization were verified after the push.
 - The benchmark file exists at `evaluation/datasets/day2-benchmark-v1.json`.
 - The previously recorded test run passed: 50 tests passed, with one non-blocking ChromaDB deprecation warning.
 - Before report creation, the `day2-part8-performance` branch had a clean working tree and `HEAD` matched `origin/main`.
@@ -113,7 +113,7 @@ Report:
 
 - `evaluation/results/day2-part8-performance-report.md`
 
-**Corrective review status:** The original report commit did not contain the three JSON result artifacts. The corrective revision adds the three existing, locally validated JSON artifacts and corrects this report's artifact-verification wording. The complete four-file diff and staged scope must pass review before the corrective commit; after commitment, the commit contents, push synchronization, and clean working tree must be verified.
+**Corrective review status:** The original report commit did not contain the three JSON result artifacts. Corrective commit `f06977a4ab33617c57d66d475955937868941009` added the three existing, locally validated JSON artifacts. After the push, the commit's four-file scope, local/remote feature-branch synchronization, unchanged `main` and `origin/main`, and clean working tree were verified. JSON syntax, unique case counts, and aggregate metric consistency were validated previously; no benchmark was rerun for this correction.
 
 **Part 8 decision:** Formal acceptance and freeze remain pending Parent review of the corrected revision. This corrective commit does not itself authorize Part 9.
 
