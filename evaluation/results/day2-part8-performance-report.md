@@ -79,15 +79,17 @@ The recorded Cross-Encoder run has a substantial reranking cost relative to its 
 
 Recorded checks for this measurement stage:
 
-- All three JSON result artifacts exist and contain 28 cases each.
+- The three local JSON result artifacts were validated during the corrective audit: each parses successfully and contains 28 unique cases (21 supported and 7 unsupported, ambiguous, or near-match cases).
 - Each artifact represents 21 supported and 7 non-supported, ambiguous, or near-match cases.
 - Dense case records use `case_id`; Hybrid/RRF and Cross-Encoder case records use `id`.
-- The recorded result artifacts share the same Git revision: `a494e49d8f35de55dffc739b16e8d34dc6a8950c`.
+- All three local result artifacts record the same Git revision: `a494e49d8f35de55dffc739b16e8d34dc6a8950c`.
+- The original report commit did not include the three JSON artifacts; they were ignored by Git and absent from that commit and the inspected Git history.
+- The corrective commit will add those three existing artifacts alongside this report; their inclusion must be verified against the corrective commit and remote branch.
 - The benchmark file exists at `evaluation/datasets/day2-benchmark-v1.json`.
-- The test suite passed: 50 tests passed, with one non-blocking ChromaDB deprecation warning.
+- The previously recorded test run passed: 50 tests passed, with one non-blocking ChromaDB deprecation warning.
 - Before report creation, the `day2-part8-performance` branch had a clean working tree and `HEAD` matched `origin/main`.
 
-These checks establish artifact and test-suite status. They do not substitute for repeated performance trials or semantic evaluation of generated answers.
+These checks distinguish local artifact validation from committed artifact availability. They do not substitute for repeated performance trials or semantic evaluation of generated answers.
 
 ## 6. Limitations and Interpretation
 
@@ -111,6 +113,8 @@ Report:
 
 - `evaluation/results/day2-part8-performance-report.md`
 
-**Part 8 decision:** Initial measurement artifacts are present and their recorded aggregate results have been transcribed for review. The report must pass diff and scope review before it is committed. Part 8 is not formally accepted or frozen until Parent reviews it.
+**Corrective review status:** The original report commit did not contain the three JSON result artifacts. The corrective revision adds the three existing, locally validated JSON artifacts and corrects this report's artifact-verification wording. The complete four-file diff and staged scope must pass review before the corrective commit; after commitment, the commit contents, push synchronization, and clean working tree must be verified.
+
+**Part 8 decision:** Formal acceptance and freeze remain pending Parent review of the corrected revision. This corrective commit does not itself authorize Part 9.
 
 No retrieval runner, grounding logic, or benchmark data change is authorized by this report.
